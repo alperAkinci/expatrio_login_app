@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.white,
                 ),
               )
-            : const Text('Sign In'),
+            : const Text("LOGIN"),
       );
     });
   }

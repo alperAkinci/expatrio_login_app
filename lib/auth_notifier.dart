@@ -53,7 +53,6 @@ class AuthNotifier extends ChangeNotifier {
         onSuccess?.call();
         return responseData;
       } else {
-        // onError?.call(responseData['message']);
         throw Exception(responseData.message ?? 'An error occurred');
       }
     } catch (error) {

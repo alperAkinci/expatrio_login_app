@@ -1,5 +1,6 @@
 import 'package:expatrio_login_app/auth_notifier.dart';
 import 'package:expatrio_login_app/login/login_page.dart';
+import 'package:expatrio_login_app/tax_data/tax_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'
     show ChangeNotifierProvider, MultiProvider;
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
         ),
         primaryColorDark: Colors.white,
       ),
-      home: const LoginPage(),
+      home: const TaxDataPage(),
     );
   }
 }
