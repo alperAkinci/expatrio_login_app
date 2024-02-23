@@ -1,4 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:expatrio_login_app/shared/countries_constants.dart';
+import 'package:expatrio_login_app/shared/item_dropdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -82,8 +84,10 @@ class _TaxDataPageState extends State<TaxDataPage> {
                     maxLines: 2,
                   ),
                   // TODO: Add country
-                  DropdownSearch<int>(
-                    items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                  DropdownSearch<ItemDropDown>(
+                    items: ItemDropDown.fromJsonList(
+                        CountriesConstants.nationality),
+                    compareFn: (i, s) => i == s,
                     dropdownDecoratorProps: DropDownDecoratorProps(
                       dropdownSearchDecoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -92,7 +96,11 @@ class _TaxDataPageState extends State<TaxDataPage> {
                         filled: true,
                       ),
                     ),
-                    popupProps: PopupPropsMultiSelection.modalBottomSheet(),
+                    popupProps: PopupPropsMultiSelection.modalBottomSheet(
+                      showSelectedItems: true,
+                      showSearchBox: true,
+                      itemBuilder: _popupItemBuilder,
+                    ),
                   ),
                 ],
               ),
@@ -146,6 +154,23 @@ class _TaxDataPageState extends State<TaxDataPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _popupItemBuilder(
+      BuildContext context, ItemDropDown item, bool isSelected) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 4),
+      decoration: !isSelected
+          ? null
+          : BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+      child: ListTile(
+        selected: isSelected,
+        title: Text(item.text),
+      ),
     );
   }
 }
