@@ -59,7 +59,6 @@ class TaxDataNotifier extends ChangeNotifier {
           await http.put(url, headers: headers, body: data.toJson());
 
       if (response.statusCode == HttpStatus.ok) {
-        // final responseData = TaxData.fromJson(response.body);
         _taxData = data;
         notifyListeners();
       } else {
