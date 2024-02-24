@@ -77,10 +77,11 @@ class _TaxDataPageState extends State<TaxDataPage> {
       isScrollControlled: true,
       context: context,
       builder: (context) {
-        final taxDataNotifier = Provider.of<TaxDataNotifier>(context);
+        final taxData = Provider.of<TaxDataNotifier>(context).taxData;
         final items = ItemDropDown.fromJsonList(CountriesConstants.nationality);
-        final selectedPrimaryTaxResidence = items.firstWhere((element) =>
-            element.key == taxDataNotifier.taxData.primaryTaxResidence.country);
+        final selectedPrimaryDropDown = items.firstWhere(
+            (element) => element.code == taxData.primaryTaxResidence.country);
+        TextEditingController primaryController = TextEditingController();
         return Container(
           height: MediaQuery.of(context).size.height * 0.8,
           padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -102,7 +103,9 @@ class _TaxDataPageState extends State<TaxDataPage> {
                   ),
                   // TODO: Add country
                   DropdownSearch<ItemDropDown>(
-                    selectedItem: selectedPrimaryTaxResidence,
+                    selectedItem: selectedPrimaryDropDown,
+                    onChanged: (item) =>
+                        selectedPrimaryDropDown.code = item!.code,
                     items: items,
                     compareFn: (i, s) => i == s,
                     dropdownDecoratorProps: DropDownDecoratorProps(
@@ -127,10 +130,11 @@ class _TaxDataPageState extends State<TaxDataPage> {
                 children: <Widget>[
                   Text("TAX IDENTIFICATION NUMBER"), // TODO: put *
                   TextFormField(
+                    controller: primaryController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0)),
-                      labelText: taxDataNotifier.taxData.primaryTaxResidence.id,
+                      labelText: taxData.primaryTaxResidence.id,
                       hintText: 'id',
                     ),
                   ),
@@ -164,7 +168,18 @@ class _TaxDataPageState extends State<TaxDataPage> {
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Provider.of<TaxDataNotifier>(context, listen: false)
+                      .updateTaxData(
+                          TaxResidence(
+                              country: selectedPrimaryDropDown.code,
+                              id: primaryController.text),
+                          []).then((_) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Your tax data has been updated! ✅')),
+                    );
+                  });
                 },
                 child: const Text("SAVE"),
               )
@@ -187,7 +202,7 @@ class _TaxDataPageState extends State<TaxDataPage> {
             ),
       child: ListTile(
         selected: isSelected,
-        title: Text(item.text),
+        title: Text(item.label),
       ),
     );
   }

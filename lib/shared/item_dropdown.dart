@@ -1,14 +1,12 @@
 import 'package:expatrio_login_app/shared/countries_constants.dart';
 
 class ItemDropDown {
-  const ItemDropDown(this.key, this.value, this.text);
-  final String key;
-  final String value;
-  final String text;
+  ItemDropDown(this.code, this.label);
+  String code;
+  String label;
 
   factory ItemDropDown.fromJson(Map<String, dynamic> json) {
     return ItemDropDown(
-      json["code"],
       json["code"],
       json["label"],
     );
@@ -23,13 +21,12 @@ class ItemDropDown {
       identical(this, other) ||
       other is ItemDropDown &&
           runtimeType == other.runtimeType &&
-          key == other.key &&
-          value == other.value &&
-          text == other.text;
+          code == other.code &&
+          label == other.label;
 
   @override
-  int get hashCode => key.hashCode ^ value.hashCode ^ text.hashCode;
+  int get hashCode => code.hashCode ^ label.hashCode;
 
   @override
-  String toString() => text;
+  String toString() => label;
 }

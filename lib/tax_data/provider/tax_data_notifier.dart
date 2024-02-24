@@ -34,4 +34,41 @@ class TaxDataNotifier extends ChangeNotifier {
 
     return _taxData;
   }
+
+  Future<TaxData> updateTaxData(TaxResidence primaryTaxResidence,
+      List<TaxResidence> secondaryTaxResidence) async {
+    try {
+      final token = await _storage.read(key: 'token');
+      final userId = int.parse(await _storage.read(key: 'userId') ?? "");
+      final url = Uri.parse(
+          'https://dev-api.expatrio.com/v3/customers/$userId/tax-data');
+
+      Map<String, String> headers = {
+        "Content-type": "application/json",
+        "Authorization": "Bearer $token",
+      };
+
+      var data = TaxData(
+          primaryTaxResidence: primaryTaxResidence,
+          secondaryTaxResidence: secondaryTaxResidence,
+          usPerson: false,
+          usTaxId: null,
+          w9FileId: null);
+
+      final response =
+          await http.put(url, headers: headers, body: data.toJson());
+
+      if (response.statusCode == HttpStatus.ok) {
+        // final responseData = TaxData.fromJson(response.body);
+        _taxData = data;
+        notifyListeners();
+      } else {
+        throw Exception('Failed to update tax data!');
+      }
+    } catch (error) {
+      rethrow;
+    }
+
+    return _taxData;
+  }
 }

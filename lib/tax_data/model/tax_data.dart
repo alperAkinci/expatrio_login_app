@@ -27,10 +27,12 @@ class TaxData {
     w9FileId = json['w9FileId'];
   }
 
-  Map<String, dynamic> toJson() {
+  String toJson() => json.encode(toMap());
+
+  Map<String, dynamic> toMap() {
     final data = <String, dynamic>{};
-    data['primaryTaxResidence'] = primaryTaxResidence;
-    data['secondaryTaxResidence'] = secondaryTaxResidence;
+    data['primaryTaxResidence'] = primaryTaxResidence.toJson();
+    data['secondaryTaxResidence'] = []; //secondaryTaxResidence;
     data['usPerson'] = usPerson;
     data['usTaxId'] = usTaxId;
     data['w9FileId'] = w9FileId;
