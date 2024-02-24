@@ -1,5 +1,6 @@
-import 'package:expatrio_login_app/auth_notifier.dart';
-import 'package:expatrio_login_app/login/login_page.dart';
+import 'package:expatrio_login_app/authentication/provider/auth_notifier.dart';
+import 'package:expatrio_login_app/authentication/presentation/login_page.dart';
+import 'package:expatrio_login_app/tax_data/provider/tax_data_notifier.dart';
 import 'package:expatrio_login_app/tax_data/tax_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'
@@ -9,6 +10,7 @@ void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => AuthNotifier()),
+      ChangeNotifierProvider(create: (context) => TaxDataNotifier()),
     ],
     child: const MyApp(),
   ));
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
         ),
         primaryColorDark: Colors.white,
       ),
-      home: const TaxDataPage(),
+      home: const LoginPage(),
     );
   }
 }

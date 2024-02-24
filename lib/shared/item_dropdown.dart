@@ -31,7 +31,5 @@ class ItemDropDown {
   int get hashCode => key.hashCode ^ value.hashCode ^ text.hashCode;
 
   @override
-  String toString() {
-    return 'ItemDropDown{key: $key, value: $value, text: $text}';
-  }
+  String toString() => text;
 }

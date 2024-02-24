@@ -1,10 +1,13 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:expatrio_login_app/shared/countries_constants.dart';
 import 'package:expatrio_login_app/shared/item_dropdown.dart';
+import 'package:expatrio_login_app/tax_data/model/tax_data.dart';
+import 'package:expatrio_login_app/tax_data/provider/tax_data_notifier.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class TaxDataPage extends StatefulWidget {
   const TaxDataPage({super.key});
@@ -14,6 +17,12 @@ class TaxDataPage extends StatefulWidget {
 }
 
 class _TaxDataPageState extends State<TaxDataPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: use font with bold style
@@ -48,7 +57,11 @@ class _TaxDataPageState extends State<TaxDataPage> {
                   child: FilledButton(
                     onPressed: () {
                       // open a model bottom sheet
-                      _showModalBottom(context);
+                      Provider.of<TaxDataNotifier>(context, listen: false)
+                          .getTaxData()
+                          .then((_) {
+                        _showModalBottom(context);
+                      });
                     },
                     child: const Text("UPDATE YOUR TAX DATA"),
                   ),
@@ -64,6 +77,10 @@ class _TaxDataPageState extends State<TaxDataPage> {
       isScrollControlled: true,
       context: context,
       builder: (context) {
+        final taxDataNotifier = Provider.of<TaxDataNotifier>(context);
+        final items = ItemDropDown.fromJsonList(CountriesConstants.nationality);
+        final selectedPrimaryTaxResidence = items.firstWhere((element) =>
+            element.key == taxDataNotifier.taxData.primaryTaxResidence.country);
         return Container(
           height: MediaQuery.of(context).size.height * 0.8,
           padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -85,8 +102,8 @@ class _TaxDataPageState extends State<TaxDataPage> {
                   ),
                   // TODO: Add country
                   DropdownSearch<ItemDropDown>(
-                    items: ItemDropDown.fromJsonList(
-                        CountriesConstants.nationality),
+                    selectedItem: selectedPrimaryTaxResidence,
+                    items: items,
                     compareFn: (i, s) => i == s,
                     dropdownDecoratorProps: DropDownDecoratorProps(
                       dropdownSearchDecoration: InputDecoration(
@@ -113,6 +130,7 @@ class _TaxDataPageState extends State<TaxDataPage> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0)),
+                      labelText: taxDataNotifier.taxData.primaryTaxResidence.id,
                       hintText: 'id',
                     ),
                   ),

@@ -1,6 +1,8 @@
-import 'package:expatrio_login_app/auth_notifier.dart';
+import 'package:expatrio_login_app/authentication/provider/auth_notifier.dart';
+import 'package:expatrio_login_app/tax_data/provider/tax_data_notifier.dart';
 import 'package:expatrio_login_app/tax_data/tax_data_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context) => const TaxDataPage(),
             ),
           );
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('You have successfully signed in!')),
           );

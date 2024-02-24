@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:expatrio_login_app/auth.dart';
+import 'package:expatrio_login_app/authentication/model/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -37,19 +37,21 @@ class AuthNotifier extends ChangeNotifier {
     setLoading(true);
     try {
       final url = Uri.parse('https://dev-api.expatrio.com/auth/login');
-      final response = await http.post(url,
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(data));
+      Map<String, String> headers = {
+        "Content-type": "application/json",
+      };
+
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(data));
       final responseData = Auth.fromJson(response.body);
 
-      if (response.statusCode == HttpStatus.ok && responseData.token != null) {
+      if (response.statusCode == HttpStatus.ok &&
+          responseData.token != null &&
+          responseData.userId != null) {
         _token = responseData.token!;
-        _saveToken(token);
+        _saveToken(token, responseData.userId!);
         _isAuthenticated = true;
         notifyListeners();
-
         onSuccess?.call();
         return responseData;
       } else {
@@ -68,13 +70,15 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _saveToken(String token) async {
+  void _saveToken(String token, int userId) async {
     await storage.write(key: 'token', value: token);
+    await storage.write(key: 'userId', value: userId.toString());
   }
 
   void _deleteToken() async {
     _isAuthenticated = false;
     await storage.delete(key: 'token');
+    await storage.delete(key: 'userId');
   }
 
   Future<void> checkToken() async {
