@@ -31,37 +31,31 @@ class TaxDataNotifier extends ChangeNotifier {
 
   Future<TaxData> updateTaxData(TaxResidence primaryTaxResidence,
       List<TaxResidence> secondaryTaxResidence) async {
-    try {
-      final token = await _storage.read(key: 'token');
-      final userId = int.parse(await _storage.read(key: 'userId') ?? "");
-      final url = Uri.parse(
-          'https://dev-api.expatrio.com/v3/customers/$userId/tax-data');
+    final token = await _storage.read(key: 'token');
+    final userId = int.parse(await _storage.read(key: 'userId') ?? "");
+    final url =
+        Uri.parse('https://dev-api.expatrio.com/v3/customers/$userId/tax-data');
 
-      Map<String, String> headers = {
-        "Content-type": "application/json",
-        "Authorization": "Bearer $token",
-      };
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer $token",
+    };
 
-      var data = TaxData(
-          primaryTaxResidence: primaryTaxResidence,
-          secondaryTaxResidence: secondaryTaxResidence,
-          usPerson: false,
-          usTaxId: null,
-          w9FileId: null);
+    var data = TaxData(
+        primaryTaxResidence: primaryTaxResidence,
+        secondaryTaxResidence: secondaryTaxResidence,
+        usPerson: false,
+        usTaxId: null,
+        w9FileId: null);
 
-      final response =
-          await http.put(url, headers: headers, body: data.toJson());
+    final response = await http.put(url, headers: headers, body: data.toJson());
 
-      if (response.statusCode == HttpStatus.ok) {
-        _taxData = data;
-        notifyListeners();
-      } else {
-        throw Exception('Failed to update tax data!');
-      }
-    } catch (error) {
-      rethrow;
+    if (response.statusCode == HttpStatus.ok) {
+      _taxData = data;
+      notifyListeners();
+      return data;
+    } else {
+      throw Exception('Failed to update tax data!');
     }
-
-    return _taxData;
   }
 }

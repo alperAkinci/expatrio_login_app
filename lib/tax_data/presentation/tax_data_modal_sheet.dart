@@ -16,6 +16,7 @@ class TaxDataModalSheet extends StatefulWidget {
 class _TaxDataModalSheet extends State<TaxDataModalSheet> {
   bool isChecked = false;
   bool isCheckBoxError = false;
+  int taxResidencelimit = 3;
 
   final countryItems =
       ItemDropDown.fromJsonList(CountriesConstants.nationality);
@@ -33,8 +34,9 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
     primaryController.text = taxData.primaryTaxResidence.id;
 
     for (var taxResidence in taxData.secondaryTaxResidence) {
-      var item = countryItems
-          .firstWhere((element) => element.code == taxResidence.country);
+      var item = countryItems.firstWhere(
+          (element) => element.code == taxResidence.country,
+          orElse: () => ItemDropDown('', ''));
       secondaryTaxResidence
           .add((item, TextEditingController(text: taxResidence.id)));
     }
@@ -57,141 +59,152 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-        expand: false,
-        maxChildSize: 0.9,
-        shouldCloseOnMinExtent: true,
-        initialChildSize: 0.75,
-        snap: true,
-        builder: (context, scrollController) {
-          var theme = Theme.of(context);
-          return SingleChildScrollView(
-            controller: scrollController,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(height: 30),
-                  Text(
-                    "Declaration of financial information",
-                    style: theme.textTheme.bodyLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+    var theme = Theme.of(context);
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.8,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              children: <Widget>[
+                const SizedBox(height: 30),
+                Text(
+                  "Declaration of financial information",
+                  style: theme.textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 30),
+                ),
+                const SizedBox(height: 30),
+                _buildTaxResidence(
+                    dropDownHeaderText:
+                        "WHICH COUNTRY SERVES AS YOUR PRIMARY TAX RESIDENCE?*",
+                    selectedItem: selectedPrimaryItem,
+                    controller: primaryController),
+                for (var item in secondaryTaxResidence)
                   _buildTaxResidence(
-                      dropDownHeaderText:
-                          "WHICH COUNTRY SERVES AS YOUR PRIMARY TAX RESIDENCE?*",
-                      selectedItem: selectedPrimaryItem,
-                      controller: primaryController),
-                  for (var item in secondaryTaxResidence)
-                    _buildTaxResidence(
-                        dropDownHeaderText:
-                            "DO YOU HAVE OTHER TAX RESIDENCES?*",
-                        selectedItem: item.$1,
-                        controller: item.$2),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor:
-                              Theme.of(context).colorScheme.secondary,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            secondaryTaxResidence.add((
-                              ItemDropDown('', ''),
-                              TextEditingController()
-                            ));
-                          });
-                        },
-                        child: const Text(
-                          "+ ADD ANOTHER",
-                        ),
-                      ),
-                      secondaryTaxResidence.isNotEmpty
-                          ? TextButton(
-                              style: TextButton.styleFrom(
-                                  foregroundColor: theme.colorScheme.error,
-                                  textStyle:
-                                      theme.textTheme.bodySmall!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                              onPressed: () {
-                                setState(() {
-                                  if (secondaryTaxResidence.isNotEmpty) {
-                                    secondaryTaxResidence.removeLast();
-                                  }
-                                });
-                              },
-                              child: const Text("- REMOVE"))
-                          : const SizedBox.shrink()
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          isError: isCheckBoxError,
-                          side: isCheckBoxError
-                              ? null
-                              : const BorderSide(color: Colors.green, width: 2),
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          checkColor: Colors.white,
-                          value: isChecked,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              isChecked = value!;
-                            });
-                          }),
-                      const Flexible(
-                        child: Text(
-                            "I confirm above tax residency and US seld-decleration is true and accurate.",
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 3),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: 150,
-                    child: FilledButton(
-                      onPressed: () {
-                        if (isChecked) {
-                          Provider.of<TaxDataNotifier>(context, listen: false)
-                              .updateTaxData(
-                                  TaxResidence(
-                                      country: selectedPrimaryItem.code,
-                                      id: primaryController.text),
-                                  secondaryTaxResidence
-                                      .map((e) => TaxResidence(
-                                          country: e.$1.code, id: e.$2.text))
-                                      .toList(growable: false))
-                              .then((_) {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Your tax data has been updated! ✅')),
-                            );
-                          });
-                        } else {
-                          setState(() {
-                            isCheckBoxError = true;
-                          });
-                        }
-                      },
-                      child: const Text("SAVE"),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
+                      dropDownHeaderText: "DO YOU HAVE OTHER TAX RESIDENCES?*",
+                      selectedItem: item.$1,
+                      controller: item.$2),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildAddAnotherButton(context),
+                    secondaryTaxResidence.isNotEmpty
+                        ? TextButton(
+                            style: TextButton.styleFrom(
+                                foregroundColor: theme.colorScheme.error,
+                                textStyle: theme.textTheme.bodySmall!.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                )),
+                            onPressed: () {
+                              setState(() {
+                                if (secondaryTaxResidence.isNotEmpty) {
+                                  secondaryTaxResidence.removeLast();
+                                }
+                              });
+                            },
+                            child: const Text("- REMOVE"))
+                        : const SizedBox.shrink()
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildCheckBox(context),
+                const SizedBox(height: 20),
+                _buildSaveButton(context),
+                const SizedBox(height: 30),
+              ],
             ),
-          );
-        });
+          ),
+        ),
+        //}),
+      ),
+    );
+  }
+
+  TextButton _buildAddAnotherButton(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        foregroundColor: Theme.of(context).colorScheme.secondary,
+      ),
+      onPressed: () {
+        if (secondaryTaxResidence.length <= taxResidencelimit) {
+          setState(() {
+            secondaryTaxResidence
+                .add((ItemDropDown('', ''), TextEditingController()));
+          });
+        }
+      },
+      child: const Text(
+        "+ ADD ANOTHER",
+      ),
+    );
+  }
+
+  SizedBox _buildSaveButton(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      child: FilledButton(
+        onPressed: () {
+          if (isChecked) {
+            Provider.of<TaxDataNotifier>(context, listen: false)
+                .updateTaxData(
+                    TaxResidence(
+                        country: selectedPrimaryItem.code,
+                        id: primaryController.text),
+                    secondaryTaxResidence
+                        .map((e) =>
+                            TaxResidence(country: e.$1.code, id: e.$2.text))
+                        .toList(growable: false))
+                .then((_) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Your tax data has been updated! ✅')),
+              );
+            }).catchError((error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(error.toString())),
+              );
+            });
+          } else {
+            setState(() {
+              isCheckBoxError = true;
+            });
+          }
+        },
+        child: const Text("SAVE"),
+      ),
+    );
+  }
+
+  Row _buildCheckBox(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Checkbox(
+            isError: isCheckBoxError,
+            side: isCheckBoxError
+                ? null
+                : const BorderSide(color: Colors.green, width: 2),
+            activeColor: Theme.of(context).colorScheme.secondary,
+            checkColor: Colors.white,
+            value: isChecked,
+            onChanged: (bool? value) {
+              setState(() {
+                isChecked = value!;
+              });
+            }),
+        const Flexible(
+          child: Text(
+              "I confirm above tax residency and US seld-decleration is true and accurate.",
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3),
+        )
+      ],
+    );
   }
 
   Column _buildTaxResidence(
@@ -229,6 +242,10 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
                 style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 4),
             DropdownSearch<ItemDropDown>(
+              onBeforePopupOpening: (selectedItem) async {
+                FocusManager.instance.primaryFocus?.unfocus();
+                return true;
+              },
               selectedItem: selectedItem,
               onChanged: (item) {
                 selectedItem.label = item!.label;
