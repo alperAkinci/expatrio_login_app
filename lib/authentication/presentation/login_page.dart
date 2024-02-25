@@ -1,9 +1,8 @@
 import 'package:expatrio_login_app/authentication/provider/auth_notifier.dart';
-import 'package:expatrio_login_app/tax_data/provider/tax_data_notifier.dart';
 import 'package:expatrio_login_app/tax_data/presentation/tax_data_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,8 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
 
   void _onSubmit() {
-    // close keyboard if it's open
-    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     final email = emailController.text;
     final password = passwordController.text;
@@ -31,14 +29,11 @@ class _LoginPageState extends State<LoginPage> {
           "password": password,
         },
         onSuccess: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const TaxDataPage(),
-            ),
-          );
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('You have successfully signed in!')),
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return SuccessModalBottomSheet();
+            },
           );
         },
         onError: (error) {
@@ -52,10 +47,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(),
-        body: SafeArea(
-          child: Column(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(),
+          body: Column(
             children: <Widget>[
               Image.asset(
                 'assets/2019_XP_logo_white.png',
@@ -73,15 +70,22 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 20),
                       _buiildPassword(),
                       const SizedBox(height: 20),
-                      Container(
+                      SizedBox(
                           width: double.infinity, child: _builldSaveButton()),
                     ],
                   ),
                 ),
               ),
+              const Expanded(
+                child: SizedBox(),
+              ),
+              Opacity(
+                opacity: 0.5,
+                child: Lottie.asset('assets/login-background.json'),
+              )
             ],
-          ),
-        ));
+          )),
+    );
   }
 
   Widget _builldSaveButton() {
@@ -169,6 +173,54 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
       ],
+    );
+  }
+}
+
+class SuccessModalBottomSheet extends StatelessWidget {
+  const SuccessModalBottomSheet({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.4,
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          Icon(
+            Icons.check_circle_rounded,
+            size: 80,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+          const SizedBox(height: 20),
+          Text("Successful Login",
+              style: Theme.of(context).textTheme.titleLarge),
+          //subtitle
+          const SizedBox(height: 10),
+          Text(
+            "You will be redirected to your dashboard",
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 150,
+            child: FilledButton(
+              onPressed: () {
+                Navigator.pop(context); // close the bottom sheet
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const TaxDataPage(),
+                  ),
+                );
+              },
+              child: const Text("GOT IT"),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
