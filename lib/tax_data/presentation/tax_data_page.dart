@@ -1,7 +1,6 @@
 import 'package:expatrio_login_app/tax_data/presentation/tax_data_modal_sheet.dart';
 import 'package:expatrio_login_app/tax_data/provider/tax_data_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 

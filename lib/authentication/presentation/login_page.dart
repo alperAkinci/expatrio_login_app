@@ -22,27 +22,22 @@ class _LoginPageState extends State<LoginPage> {
     final email = emailController.text;
     final password = passwordController.text;
 
-    Future.wait([
-      Provider.of<AuthNotifier>(context, listen: false).signIn(
-        data: {
+    Provider.of<AuthNotifier>(context, listen: false)
+        .signIn(data: {
           "email": email,
           "password": password,
-        },
-        onSuccess: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return SuccessModalBottomSheet();
-            },
-          );
-        },
-        onError: (error) {
+        })
+        .then((_) => showModalBottomSheet(
+              context: context,
+              builder: (context) {
+                return const SuccessModalBottomSheet();
+              },
+            ))
+        .catchError((error) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error)),
+            SnackBar(content: Text(error.toString())),
           );
-        },
-      ),
-    ]);
+        });
   }
 
   @override

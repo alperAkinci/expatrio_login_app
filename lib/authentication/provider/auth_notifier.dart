@@ -29,39 +29,28 @@ class AuthNotifier extends ChangeNotifier {
     }
   }
 
-  Future<Auth> signIn({
-    required Map data,
-    Function? onSuccess,
-    Function? onError,
-  }) async {
+  Future<Auth> signIn({required Map data}) async {
     setLoading(true);
-    try {
-      final url = Uri.parse('https://dev-api.expatrio.com/auth/login');
-      Map<String, String> headers = {
-        "Content-type": "application/json",
-      };
+    final url = Uri.parse('https://dev-api.expatrio.com/auth/login');
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+    };
 
-      final response =
-          await http.post(url, headers: headers, body: jsonEncode(data));
-      final responseData = Auth.fromJson(response.body);
+    final response =
+        await http.post(url, headers: headers, body: jsonEncode(data));
+    final responseData = Auth.fromJson(response.body);
 
-      if (response.statusCode == HttpStatus.ok &&
-          responseData.token != null &&
-          responseData.userId != null) {
-        _token = responseData.token!;
-        _saveToken(token, responseData.userId!);
-        _isAuthenticated = true;
-        notifyListeners();
-        onSuccess?.call();
-        return responseData;
-      } else {
-        throw Exception(responseData.message ?? 'An error occurred');
-      }
-    } catch (error) {
-      onError?.call(error.toString());
-      rethrow;
-    } finally {
-      setLoading(false);
+    setLoading(false);
+    if (response.statusCode == HttpStatus.ok &&
+        responseData.token != null &&
+        responseData.userId != null) {
+      _token = responseData.token!;
+      _saveToken(token, responseData.userId!);
+      _isAuthenticated = true;
+      notifyListeners();
+      return responseData;
+    } else {
+      throw Exception(responseData.message ?? 'An error occurred');
     }
   }
 
