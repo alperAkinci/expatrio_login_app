@@ -53,6 +53,10 @@ class _TaxDataPageState extends State<TaxDataPage> {
                           .getTaxData()
                           .then((_) {
                         _showModalBottom(context);
+                      }).catchError((error) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(error.toString())),
+                        );
                       });
                     },
                     child: const Text("UPDATE YOUR TAX DATA"),
