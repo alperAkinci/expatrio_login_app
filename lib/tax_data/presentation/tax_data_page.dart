@@ -19,12 +19,6 @@ class TaxDataPage extends StatefulWidget {
 
 class _TaxDataPageState extends State<TaxDataPage> {
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     // TODO: use font with bold style
     final titleLargeStyle = Theme.of(context).textTheme.bodyLarge;
@@ -57,7 +51,6 @@ class _TaxDataPageState extends State<TaxDataPage> {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () {
-                      // open a model bottom sheet
                       Provider.of<TaxDataNotifier>(context, listen: false)
                           .getTaxData()
                           .then((_) {

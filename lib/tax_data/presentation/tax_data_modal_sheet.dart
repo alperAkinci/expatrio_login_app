@@ -3,10 +3,7 @@ import 'package:expatrio_login_app/shared/countries_constants.dart';
 import 'package:expatrio_login_app/shared/item_dropdown.dart';
 import 'package:expatrio_login_app/tax_data/model/tax_data.dart';
 import 'package:expatrio_login_app/tax_data/provider/tax_data_notifier.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class TaxDataModalSheet extends StatefulWidget {
@@ -152,7 +149,11 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
                                 TaxResidence(
                                     country: selectedPrimaryItem.code,
                                     id: primaryController.text),
-                                []).then((_) {
+                                secondaryTaxResidence
+                                    .map((e) => TaxResidence(
+                                        country: e.$1.code, id: e.$2.text))
+                                    .toList(growable: false))
+                            .then((_) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -188,7 +189,6 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
             ),
-            // TODO: Add country
             DropdownSearch<ItemDropDown>(
               selectedItem: selectedItem,
               onChanged: (item) => selectedItem.code = item!.code,
@@ -199,7 +199,6 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0)),
                   hintText: "Select country",
-                  //filled: true,
                 ),
               ),
               popupProps: PopupPropsMultiSelection.modalBottomSheet(

@@ -1,4 +1,5 @@
 import 'dart:convert' show json;
+import 'dart:ffi';
 
 class TaxData {
   TaxData({
@@ -11,7 +12,7 @@ class TaxData {
   late final TaxResidence primaryTaxResidence;
   late final List<TaxResidence> secondaryTaxResidence;
   late final bool usPerson;
-  late final int? usTaxId;
+  late final String? usTaxId;
   late final int? w9FileId;
 
   factory TaxData.fromJson(String data) {
@@ -32,7 +33,8 @@ class TaxData {
   Map<String, dynamic> toMap() {
     final data = <String, dynamic>{};
     data['primaryTaxResidence'] = primaryTaxResidence.toJson();
-    data['secondaryTaxResidence'] = []; //secondaryTaxResidence;
+    data['secondaryTaxResidence'] =
+        secondaryTaxResidence.map((x) => x.toJson()).toList();
     data['usPerson'] = usPerson;
     data['usTaxId'] = usTaxId;
     data['w9FileId'] = w9FileId;
