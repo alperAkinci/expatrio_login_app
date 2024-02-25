@@ -7,14 +7,13 @@ import 'package:http/http.dart' as http;
 class TaxDataNotifier extends ChangeNotifier {
   late TaxData _taxData;
   TaxData get taxData => _taxData;
-
   final _storage = const FlutterSecureStorage();
+  final String _baseURL = "https://dev-api.expatrio.com";
 
   Future<TaxData> getTaxData() async {
     final token = await _storage.read(key: 'token');
     final userId = int.parse(await _storage.read(key: 'userId') ?? "");
-    final url =
-        Uri.parse('https://dev-api.expatrio.com/v3/customers/$userId/tax-data');
+    final url = Uri.parse('$_baseURL/v3/customers/$userId/tax-data');
     final response = await http.get(url, headers: {
       "Authorization": "Bearer $token",
     });
@@ -33,8 +32,7 @@ class TaxDataNotifier extends ChangeNotifier {
       List<TaxResidence> secondaryTaxResidence) async {
     final token = await _storage.read(key: 'token');
     final userId = int.parse(await _storage.read(key: 'userId') ?? "");
-    final url =
-        Uri.parse('https://dev-api.expatrio.com/v3/customers/$userId/tax-data');
+    final url = Uri.parse('$_baseURL/v3/customers/$userId/tax-data');
 
     Map<String, String> headers = {
       "Content-type": "application/json",
