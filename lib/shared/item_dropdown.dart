@@ -1,5 +1,3 @@
-import 'package:expatrio_login_app/shared/countries_constants.dart';
-
 class ItemDropDown {
   ItemDropDown(this.code, this.label);
   String code;
