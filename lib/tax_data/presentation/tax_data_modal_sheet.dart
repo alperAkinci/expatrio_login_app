@@ -198,7 +198,25 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
       {required String dropDownHeaderText,
       required ItemDropDown selectedItem,
       required TextEditingController controller}) {
-    countryItems.remove(selectedPrimaryItem);
+    Future<List<ItemDropDown>> getFilteredItems() async {
+      List<ItemDropDown> filteredCountryItems = [];
+      filteredCountryItems = List.from(countryItems);
+      // Remove all the items that are already selected
+      filteredCountryItems
+          .removeWhere((element) => element.code == selectedPrimaryItem!.code);
+      for (var item in secondaryTaxResidence) {
+        filteredCountryItems
+            .removeWhere((element) => element.code == item.$1.code);
+      }
+      // Add the selected item to the list
+      if (selectedItem.code.isNotEmpty) {
+        filteredCountryItems.add(selectedItem);
+        filteredCountryItems.sort((a, b) => a.label.compareTo(b.label));
+      }
+
+      return filteredCountryItems;
+    }
+
     return Column(
       children: [
         Column(
@@ -212,8 +230,11 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
             const SizedBox(height: 4),
             DropdownSearch<ItemDropDown>(
               selectedItem: selectedItem,
-              onChanged: (item) => selectedItem.code = item!.code,
-              items: countryItems,
+              onChanged: (item) {
+                selectedItem.label = item!.label;
+                selectedItem.code = item!.code;
+              },
+              asyncItems: (_) => getFilteredItems(),
               compareFn: (i, s) => i == s,
               dropdownDecoratorProps: DropDownDecoratorProps(
                 baseStyle: const TextStyle(height: 0.7),
