@@ -130,11 +130,18 @@ class _TaxDataModalSheet extends State<TaxDataModalSheet> {
         foregroundColor: Theme.of(context).colorScheme.secondary,
       ),
       onPressed: () {
-        if (secondaryTaxResidence.length <= taxResidencelimit) {
+        if (secondaryTaxResidence.length < taxResidencelimit) {
           setState(() {
             secondaryTaxResidence
                 .add((ItemDropDown('', ''), TextEditingController()));
           });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  "You can only add up to $taxResidencelimit secondary tax residences"),
+            ),
+          );
         }
       },
       child: const Text(
