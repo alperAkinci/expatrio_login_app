@@ -1,4 +1,4 @@
-# Expatrio Challenge App
+# Flutter Login App
 
 A Flutter application using Expatrio API implements a login page, a screen with
 a Call-to-Action (CTA) to update tax data, and a bottom sheet for inputting and editing tax data.
